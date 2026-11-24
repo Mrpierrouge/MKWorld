@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>MkWorld Randomiser</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <img id="bg-image" src="assets/img/map.png" alt="" />
+    <div id="screen"></div>
+    <nav id="bottom-nav"></nav>
+  </div>
+
+  <!-- Utilitaires / état (ordre important : pas de modules ES, scripts classiques chargés en séquence) -->
+  <script src="src/core/utils.js"></script>
+  <script src="src/core/persistence.js"></script>
+  <script src="src/core/eloSystems.js"></script>
+  <script src="src/data/tracks.js"></script>
+  <script src="src/data/avatars.js"></script>
+  <script src="src/state/trackState.js"></script>
+  <script src="src/state/scoreState.js"></script>
+  <script src="src/state/historyState.js"></script>
+  <script src="src/state/settingsState.js"></script>
+
+  <!-- Composants UI réutilisables -->
+  <script src="src/ui/icons.js"></script>
+  <script src="src/ui/dialog.js"></script>
+  <script src="src/ui/avatar.js"></script>
+  <script src="src/ui/podium.js"></script>
+  <script src="src/ui/playerDetails.js"></script>
+  <script src="src/ui/profilePopup.js"></script>
+  <script src="src/ui/spinWheel.js"></script>
+  <script src="src/ui/confetti.js"></script>
+
+  <!-- Écrans -->
+  <script src="src/screens/home.js"></script>
+  <script src="src/screens/tracks.js"></script>
+  <script src="src/screens/raceResult.js"></script>
+  <script src="src/screens/history.js"></script>
+  <script src="src/screens/scores.js"></script>
+  <script src="src/screens/settings.js"></script>
+
+  <!-- Routeur + bootstrap -->
+  <script src="src/app.js"></script>
+</body>
+</html>
