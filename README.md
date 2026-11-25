@@ -6,21 +6,44 @@ ni installation.
 
 ## Lancer l'application
 
-Aucune dépendance, aucun build. Deux façons de l'utiliser :
+Aucune dépendance à installer. L'application utilise Supabase pour les profils et les courses;
+elle doit être lancée par le serveur Node fourni (double-cliquer `index.html` ou utiliser un
+serveur statique simple ne fournit pas la configuration Supabase).
 
-1. **Double-clic sur `index.html`** — fonctionne directement en `file://` (pas de modules ES,
-   pas de `fetch`, images chargées en `<img src>` classiques).
-2. **Via un petit serveur local** (recommandé pour un vrai usage, ex. sur mobile en LAN) :
-   ```bash
-   npx serve .
-   # ou
-   python -m http.server 8080
-   ```
-   puis ouvrir `http://localhost:8080`.
+1. À la racine du projet, créez un fichier `.env` avec `API_URL` et `SB_PUBLIC_KEY` (la clé
+   publishable Supabase). Le `.env` local est ignoré par Git.
+2. Exécutez `node server.js`, puis ouvrez `http://localhost:8080`.
 
-Les données (joueurs, scores, thème) sont sauvegardées dans le `localStorage` du navigateur :
-elles persistent d'une session à l'autre, tant que vous ouvrez l'app depuis la même origine
-(même fichier / même URL de serveur).
+Le serveur ne transmet au navigateur que l'URL Supabase et la clé publishable. `SB_SECRET_KEY`
+n'est pas utilisée : ne la placez jamais dans du code navigateur ni dans une réponse HTTP. Une
+clé publishable est conçue pour être visible; la sécurité des données repose sur les règles RLS
+de Supabase.
+
+## Déployer sur Vercel
+
+Le dossier `api/config.js` expose uniquement `API_URL` et `SB_PUBLIC_KEY` dans une Vercel Function;
+`vercel.json` redirige `/config.js` vers cette fonction. `server.js` reste le serveur de
+développement local.
+
+À l'import du dépôt, sélectionnez **Other** comme Framework Preset. Il n'y a pas de dépendances
+ni de compilation : laissez **Build Command** et **Install Command** vides. Laissez **Output
+Directory** par défaut pour servir la racine du projet; si Vercel demande explicitement un dossier,
+indiquez `.`. N'indiquez ni `public` ni `dist`.
+
+Dans les variables d'environnement du projet Vercel, ajoutez `API_URL` et `SB_PUBLIC_KEY` pour
+Production (et Preview si souhaité), puis redéployez. N'ajoutez pas `SB_SECRET_KEY`. Vérifiez
+ensuite le déploiement Preview avant de promouvoir la version Production.
+
+Exécutez d'abord [`supabase.sql`](./supabase.sql) dans l'éditeur SQL Supabase pour créer les tables
+et leurs politiques. Ces politiques permettent actuellement à toute personne ayant l'application
+de lire, ajouter, modifier et supprimer profils et courses. Pour un usage public, ajoutez une
+authentification et resserrez-les. L'URL Supabase doit aussi autoriser le domaine de l'application
+si une politique CORS est configurée.
+
+Au premier démarrage, si les tables Supabase sont vides, les anciennes données de joueurs et
+d'historique présentes dans le `localStorage` de ce navigateur sont importées automatiquement.
+Les profils et courses suivants sont enregistrés dans Supabase et partagés; les préférences
+d'affichage (thème) restent locales à chaque navigateur.
 
 ## Fonctionnalités portées
 
@@ -83,13 +106,14 @@ assets/
   img/               Icônes des circuits + avatars + fond de carte (copiés depuis l'app Android)
   fonts/minecraft.ttf
 src/
-  core/              utils (mini hyperscript `h`, helpers), persistance localStorage, 3 systèmes d'ELO
+  core/              utils, client REST Supabase, persistance des profils/courses, 3 systèmes d'ELO
   data/              Données statiques : 40 circuits, graphe des trajets, avatars
   state/             Portage des 3 ViewModels Android (Track / Score / Settings)
   ui/                Composants réutilisables : roue de sélection, confettis, dialogues,
                      avatar, podium, popup de profil, détails joueur, icônes SVG
   screens/           Les 5 écrans (Aléatoire, Circuits, Résultats de course, Scores, Réglages)
   app.js             Routeur (hash-based) + barre de navigation + bootstrap
+server.js            Serveur statique local, fournit uniquement la configuration publique Supabase
 ```
 
 Pas de framework, pas de build : chaque fichier est un script classique (pas de modules ES) qui

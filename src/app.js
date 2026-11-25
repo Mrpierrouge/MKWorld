@@ -14,6 +14,15 @@ const ROUTES = {
 let currentRoute = null;
 const screenEl = document.getElementById('screen');
 const bottomNavEl = document.getElementById('bottom-nav');
+const appStatusEl = document.getElementById('app-status');
+let appStatusTimer = null;
+
+function showAppStatus(message) {
+  appStatusEl.textContent = message;
+  appStatusEl.hidden = false;
+  if (appStatusTimer) clearTimeout(appStatusTimer);
+  appStatusTimer = setTimeout(() => { appStatusEl.hidden = true; }, 8000);
+}
 
 function routeFromHash() {
   const route = location.hash.replace('#', '').trim();
@@ -75,7 +84,25 @@ function buildBottomNav() {
   });
 }
 
-function bootstrap() {
+async function bootstrap() {
+  clearChildren(screenEl);
+  screenEl.append(h('p', { class: 'app-loading' }, 'Connexion à Supabase…'));
+  let data;
+  try {
+    data = await Persistence.initialize();
+  } catch (error) {
+    console.error('Chargement initial depuis Supabase impossible.', error);
+    clearChildren(screenEl);
+    screenEl.append(h('div', { class: 'app-load-error' }, [
+      h('h2', {}, 'Connexion à la base impossible'),
+      h('p', {}, 'Vérifiez la configuration Supabase, votre connexion et les règles RLS, puis réessayez.'),
+      h('button', { class: 'btn btn-primary', onclick: bootstrap }, 'Réessayer'),
+    ]));
+    return;
+  }
+  ScoreState.players = data.players.map(migratePlayer);
+  HistoryState.entries = data.history;
+
   SettingsState.init();
   if (window.matchMedia) {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {

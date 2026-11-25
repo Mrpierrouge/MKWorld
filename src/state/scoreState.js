@@ -38,7 +38,7 @@ function migratePlayer(p) {
 }
 
 const ScoreState = {
-  players: Persistence.loadPlayers().map(migratePlayer),
+  players: [],
   editingProfile: null,
 
   /** @param systemId 'rank' | 'bots' | 'points' (voir ELO_SYSTEM_ORDER) */
