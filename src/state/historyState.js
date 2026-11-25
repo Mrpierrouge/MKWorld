@@ -6,7 +6,7 @@
  */
 
 const HistoryState = {
-  entries: Persistence.loadHistory(),
+  entries: [],
   pendingEntryId: null, // dernière course tirée, en attente d'un résultat éventuel
 
   /** Appelé dès qu'un circuit (ou trajet) est tiré et affiché, résultat ou non. */

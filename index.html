@@ -9,12 +9,15 @@
 <body>
   <div id="app">
     <img id="bg-image" src="assets/img/map.png" alt="" />
+    <div id="app-status" role="status" aria-live="polite" hidden></div>
     <div id="screen"></div>
     <nav id="bottom-nav"></nav>
   </div>
 
   <!-- Utilitaires / état (ordre important : pas de modules ES, scripts classiques chargés en séquence) -->
   <script src="src/core/utils.js"></script>
+  <script src="/config.js"></script>
+  <script src="src/core/supabase.js"></script>
   <script src="src/core/persistence.js"></script>
   <script src="src/core/eloSystems.js"></script>
   <script src="src/data/tracks.js"></script>
