@@ -17,15 +17,28 @@ serveur statique simple ne fournit pas la configuration Supabase).
 Le serveur ne transmet au navigateur que l'URL Supabase et la clé publishable. `SB_SECRET_KEY`
 n'est pas utilisée : ne la placez jamais dans du code navigateur ni dans une réponse HTTP. Une
 clé publishable est conçue pour être visible; la sécurité des données repose sur les règles RLS
-de Supabase. Pour que d'autres personnes accèdent à l'application, déployez-la sur un hébergement
-capable d'exécuter `server.js` et configurez-y `API_URL` et `SB_PUBLIC_KEY` comme variables
-d'environnement; configurez également `HOST=0.0.0.0` si l'hébergeur l'exige. L'URL Supabase doit
-aussi autoriser le domaine de l'application si une politique CORS est configurée.
+de Supabase.
+
+## Déployer sur Vercel
+
+Le dossier `api/config.js` expose uniquement `API_URL` et `SB_PUBLIC_KEY` dans une Vercel Function;
+`vercel.json` redirige `/config.js` vers cette fonction. `server.js` reste le serveur de
+développement local.
+
+À l'import du dépôt, sélectionnez **Other** comme Framework Preset. Il n'y a pas de dépendances
+ni de compilation : laissez **Build Command** et **Install Command** vides. Laissez **Output
+Directory** par défaut pour servir la racine du projet; si Vercel demande explicitement un dossier,
+indiquez `.`. N'indiquez ni `public` ni `dist`.
+
+Dans les variables d'environnement du projet Vercel, ajoutez `API_URL` et `SB_PUBLIC_KEY` pour
+Production (et Preview si souhaité), puis redéployez. N'ajoutez pas `SB_SECRET_KEY`. Vérifiez
+ensuite le déploiement Preview avant de promouvoir la version Production.
 
 Exécutez d'abord [`supabase.sql`](./supabase.sql) dans l'éditeur SQL Supabase pour créer les tables
 et leurs politiques. Ces politiques permettent actuellement à toute personne ayant l'application
 de lire, ajouter, modifier et supprimer profils et courses. Pour un usage public, ajoutez une
-authentification et resserrez-les.
+authentification et resserrez-les. L'URL Supabase doit aussi autoriser le domaine de l'application
+si une politique CORS est configurée.
 
 Au premier démarrage, si les tables Supabase sont vides, les anciennes données de joueurs et
 d'historique présentes dans le `localStorage` de ce navigateur sont importées automatiquement.
