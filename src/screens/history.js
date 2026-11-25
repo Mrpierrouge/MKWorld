@@ -6,6 +6,22 @@ function formatHistoryTimestamp(ts) {
   });
 }
 
+function historyDayKey(ts) {
+  const date = new Date(ts);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function formatHistoryDay(ts) {
+  const date = new Date(ts);
+  const today = new Date();
+  if (date.toDateString() === today.toDateString()) return "Aujourd'hui";
+  today.setDate(today.getDate() - 1);
+  if (date.toDateString() === today.toDateString()) return 'Hier';
+  return date.toLocaleDateString('fr-FR', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  });
+}
+
 const HistoryScreen = {
   render(container) {
     clearChildren(container);
@@ -22,9 +38,20 @@ const HistoryScreen = {
     }
 
     const list = h('div', { class: 'ts-list' });
+    let currentGroup = null;
     entries.forEach((entry) => {
+      const dayKey = historyDayKey(entry.timestamp);
+      if (!currentGroup || currentGroup.dayKey !== dayKey) {
+        currentGroup = {
+          dayKey,
+          element: h('section', { class: 'hist-day-group' }, [
+            h('h3', { class: 'hist-day-heading' }, formatHistoryDay(entry.timestamp)),
+          ]),
+        };
+        list.append(currentGroup.element);
+      }
       const card = this.buildCard(entry);
-      if (card) list.append(card);
+      if (card) currentGroup.element.append(card);
     });
     container.append(list);
   },

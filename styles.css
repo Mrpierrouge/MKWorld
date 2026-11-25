@@ -313,6 +313,12 @@ html[data-theme='dark'] #bg-image { opacity: 0.15; }
 .avatar-fallback { border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; flex: none; }
 
 /* ================= Historique ================= */
+.hist-day-group { display: flex; flex-direction: column; gap: 8px; }
+.hist-day-heading {
+  display: flex; align-items: center; gap: 10px; margin: 8px 0 2px;
+  color: var(--mk-on-surface-variant); font-size: 12px; font-weight: 700; text-transform: capitalize;
+}
+.hist-day-heading::before, .hist-day-heading::after { content: ''; height: 1px; flex: 1; background: var(--mk-outline); }
 .hist-info { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .hist-date { font-size: 11px; color: gray; }
 .hist-result-list { display: flex; flex-direction: column; gap: 10px; max-height: 55vh; overflow-y: auto; }
