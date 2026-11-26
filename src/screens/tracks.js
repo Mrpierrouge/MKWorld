@@ -90,7 +90,7 @@ const TracksScreen = {
 
     const row = h('div', {
       class: 'ts-card-row',
-      onclick: () => { TrackState.toggleTrack(track.id); rerender(); },
+      onclick: () => this.openTrackStats(track),
     }, [
       thumb,
       h('div', { class: 'ts-name' + (isSelected ? '' : ' off') }, track.name),
@@ -142,5 +142,52 @@ const TracksScreen = {
     }
 
     return card;
+  },
+
+  openTrackStats(track) {
+    const stats = Persistence.trackStats.filter((stat) => stat.trackId === track.id);
+    const content = h('div', { class: 'track-stats-modal' }, [
+      h('img', { class: 'track-stats-image', src: track.large, alt: track.name }),
+      h('h2', { class: 'track-stats-title' }, track.name),
+    ]);
+
+    if (stats.length === 0) {
+      content.append(h('p', { class: 'track-stats-empty' }, 'Aucun résultat enregistré pour ce circuit.'));
+    } else {
+      content.append(this.buildTrackStatSection(stats, 'Plus haut % de premières places', 'firstPlaceCount', true));
+      content.append(this.buildTrackStatSection(stats, 'Plus haut % de podiums', 'podiumCount', true));
+      content.append(this.buildTrackStatSection(stats, 'Plus bas % de podiums', 'podiumCount', false));
+    }
+
+    openModal(content);
+  },
+
+  buildTrackStatSection(stats, title, countKey, highest) {
+    const availableStats = stats.filter((stat) => ScoreState.players.some((player) => player.id === stat.playerId));
+    const section = h('section', { class: 'track-stats-section' }, [
+      h('h3', {}, title),
+    ]);
+
+    if (availableStats.length === 0) {
+      section.append(h('p', { class: 'track-stats-empty' }, 'Aucun joueur disponible.'));
+      return section;
+    }
+
+    const percentages = availableStats.map((stat) => stat[countKey] / stat.raceCount);
+    const target = highest ? Math.max(...percentages) : Math.min(...percentages);
+    const leaders = availableStats.filter((stat) => stat[countKey] / stat.raceCount === target);
+
+    leaders.forEach((stat) => {
+      const player = ScoreState.players.find((candidate) => candidate.id === stat.playerId);
+      if (!player) return;
+      const percentage = Math.round((stat[countKey] / stat.raceCount) * 100);
+      section.append(h('div', { class: 'track-stats-player' }, [
+        playerAvatarEl(player, 36, { initialsFallback: true }),
+        h('span', { class: 'track-stats-player-name' }, player.name),
+        h('span', { class: 'track-stats-value' }, `${percentage} % (${stat[countKey]}/${stat.raceCount})`),
+      ]));
+    });
+
+    return section;
   },
 };

@@ -5,6 +5,7 @@ const Persistence = {
   HISTORY_STORAGE_KEY: 'mkw_history_v1',
   playerIds: new Set(),
   historyIds: new Set(),
+  trackStats: [],
   playerQueue: Promise.resolve(),
   historyQueue: Promise.resolve(),
 
@@ -32,9 +33,15 @@ const Persistence = {
       }
     }
 
+    await this.loadTrackStats();
     this.playerIds = new Set(players.map((player) => player.id));
     this.historyIds = new Set(history.map((entry) => entry.id));
     return { players, history };
+  },
+
+  async loadTrackStats() {
+    const rows = await this.loadAllRows('track_player_stats');
+    this.trackStats = rows.map(this.trackStatFromRow);
   },
 
   async loadAllRows(table) {
@@ -115,6 +122,16 @@ const Persistence = {
     };
   },
 
+  trackStatFromRow(row) {
+    return {
+      trackId: row.track_id,
+      playerId: row.player_id,
+      raceCount: Number(row.race_count),
+      firstPlaceCount: Number(row.first_place_count),
+      podiumCount: Number(row.podium_count),
+    };
+  },
+
   savePlayers(players) {
     this.playerQueue = this.playerQueue.then(() => this.syncPlayers(players));
     this.playerQueue = this.playerQueue.catch((error) => this.reportSaveError(error));
@@ -153,6 +170,7 @@ const Persistence = {
       .filter((id) => !nextIds.has(id))
       .map((id) => SupabaseClient.request('race_history', `id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' })));
     this.historyIds = nextIds;
+    await this.loadTrackStats();
   },
 
   reportSaveError(error) {
