@@ -74,7 +74,14 @@ function attachLongPress(el, onClick, onLongPress, delay = 500) {
   el.addEventListener('pointerdown', start);
   el.addEventListener('pointerup', () => {
     cancel();
-    if (!longFired) onClick();
+  });
+  el.addEventListener('click', (e) => {
+    if (longFired && e.detail !== 0) {
+      longFired = false;
+      e.preventDefault();
+      return;
+    }
+    onClick();
   });
   el.addEventListener('pointerleave', cancel);
   el.addEventListener('contextmenu', (e) => e.preventDefault());

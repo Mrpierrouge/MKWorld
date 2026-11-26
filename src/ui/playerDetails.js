@@ -1,4 +1,4 @@
-/** Portage de ui/composables/PlayerDetailsComposable.kt (ModalBottomSheet). */
+/** Portage de ui/composables/PlayerDetailsComposable.kt. */
 
 function buildStatTile(iconFn, value, label, color) {
   return h('div', { class: 'pd-stat' }, [
@@ -25,7 +25,7 @@ function openPlayerDetails(player, { onEditProfile } = {}) {
     })(),
   ]);
   if (onEditProfile) {
-    const badge = h('div', { class: 'pd-edit-badge', onclick: () => { onEditProfile(); sheet.close(); } }, Icons.edit());
+    const badge = h('div', { class: 'pd-edit-badge', onclick: () => { onEditProfile(); modal.close(); } }, Icons.edit());
     avatarWrap.append(badge);
   }
 
@@ -61,6 +61,6 @@ function openPlayerDetails(player, { onEditProfile } = {}) {
     mapsRow,
   ]);
 
-  const sheet = openBottomSheet(content);
-  return sheet;
+  const modal = openModal(content);
+  return modal;
 }

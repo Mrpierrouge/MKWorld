@@ -373,7 +373,7 @@ html[data-theme='dark'] #bg-image { opacity: 0.15; }
 }
 @media (max-width: 480px) { .fab { right: 16px; } }
 
-/* ================= Player details sheet ================= */
+/* ================= Player details popup ================= */
 .pd-avatar-wrap { position: relative; width: 90px; height: 90px; margin: 0 auto 8px; }
 .pd-avatar-wrap img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 1px solid var(--mk-outline); }
 .pd-edit-badge {
