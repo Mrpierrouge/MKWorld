@@ -34,10 +34,13 @@ Dans les variables d'environnement du projet Vercel, ajoutez `API_URL` et `SB_PU
 Production (et Preview si souhaité), puis redéployez. N'ajoutez pas `SB_SECRET_KEY`. Vérifiez
 ensuite le déploiement Preview avant de promouvoir la version Production.
 
-Exécutez [`supabase.sql`](./supabase.sql), puis [`supabase_migration_2.sql`](./supabase_migration_2.sql)
+Exécutez [`supabase.sql`](./sql/supabase.sql), puis [`supabase_migration_2.sql`](./sql/supabase_migration_2.sql)
 dans l'éditeur SQL Supabase pour créer les tables et leurs politiques. Exécutez ensuite
-[`seeder1.sql`](./seeder1.sql) une fois pour calculer les statistiques des courses déjà enregistrées.
-Les statistiques sont ensuite recalculées automatiquement à chaque modification de l'historique.
+[`supabase_migration_3.sql`](./sql/supabase_migration_3.sql) pour appliquer le correctif et recalculer
+les statistiques existantes. Les statistiques sont ensuite recalculées automatiquement à chaque
+modification de l'historique. Pour reconstruire les scores ELO et statistiques des joueurs depuis
+l'historique, exécutez [`supabase_resync_elos.sql`](./sql/supabase_resync_elos.sql) ; ce script suppose
+des scores initiaux à 3000, aucune réinitialisation et des résultats complets dans l'historique.
 Les politiques permettent actuellement à toute personne ayant l'application
 de lire, ajouter, modifier et supprimer profils et courses. Pour un usage public, ajoutez une
 authentification et resserrez-les. L'URL Supabase doit aussi autoriser le domaine de l'application
